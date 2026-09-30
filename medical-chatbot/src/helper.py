@@ -232,8 +232,21 @@ Assistant:"""
         query = inputs["input"]
         chat_history = inputs.get("chat_history", "")
 
-        # Retrieve relevant docs
-        docs = retriever.invoke(query)
+        # Query Reformulation Heuristic:
+        # If the user asks a very short follow-up (e.g. "symptoms", "precautions"),
+        # Pinecone will return generic documents. We prepend the original topic
+        # (the first user message) to the search query to maintain context.
+        search_query = query
+        if len(query.split()) <= 3 and chat_history:
+            lines = chat_history.strip().split("\n")
+            user_lines = [l for l in lines if l.startswith("User: ")]
+            if user_lines:
+                first_topic = user_lines[0].replace("User: ", "").strip()
+                search_query = f"{first_topic} {query}"
+                print(f"🔄 Reformulated search query: '{search_query}'")
+
+        # Retrieve relevant docs using the context-aware search query
+        docs = retriever.invoke(search_query)
         context_str = format_docs(docs)
 
         # Build and invoke the prompt → LLM
