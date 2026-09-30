@@ -852,3 +852,6 @@
     display: none !important;
   }
 }
+
+/* Hide redundant right-side header title when sidebar is expanded */
+.medpulse-modal.expanded .header-brand { visibility: hidden; }

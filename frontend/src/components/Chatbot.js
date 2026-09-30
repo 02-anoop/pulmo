@@ -40,7 +40,7 @@ const DEFAULT_PROMPTS = [
   },
   {
     title: 'Pulmonary Nodules',
-    query: 'What causes pulmonary nodules and how are they evaluated on CT scans?',
+    query: 'What causes pulmonary nodules and how are they evaluated on scans?',
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
@@ -54,12 +54,12 @@ const DEFAULT_PROMPTS = [
 /**
  * MEDPULSE AI - RAG CHATBOT COMPONENT
  * Renders the clinical conversational interface with dual display modes:
- *  - Floating compressed window (ideal for quick questions while viewing CT scans)
+ *  - Floating compressed window (ideal for quick questions while viewing scans)
  *  - Full-screen expanded studio view with session sidebar, history search, and multi-turn threads
  *
  * @component
  * @param {Object} props
- * @param {Object} [props.analysisResult] - Optional current CT scan prediction context
+ * @param {Object} [props.analysisResult] - Optional current scan prediction context
  * @returns {JSX.Element}
  */
 const Chatbot = ({ analysisResult }) => {
@@ -67,6 +67,7 @@ const Chatbot = ({ analysisResult }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedIndex, setCopiedIndex] = useState(null);
+  const [pendingPrompt, setPendingPrompt] = useState(null);
 
   // Load saved chats from localStorage
   const [chats, setChats] = useState(() => {
@@ -120,6 +121,27 @@ const Chatbot = ({ analysisResult }) => {
     }
   }, [isOpen, isExpanded]);
 
+  // Listen for custom event to open chatbot and send a prompt
+  useEffect(() => {
+    const handleCustomEvent = (e) => {
+      setIsOpen(true);
+      setIsExpanded(true);
+      if (e.detail && e.detail.prompt) {
+        setPendingPrompt(e.detail.prompt);
+      }
+    };
+    window.addEventListener('open-chatbot-with-prompt', handleCustomEvent);
+    return () => window.removeEventListener('open-chatbot-with-prompt', handleCustomEvent);
+  }, []);
+
+  // Send the pending prompt when ready
+  useEffect(() => {
+    if (pendingPrompt && !isTyping) {
+      handleSendMessage(pendingPrompt);
+      setPendingPrompt(null);
+    }
+  }, [pendingPrompt, isTyping]); // eslint-disable-line react-hooks/exhaustive-deps
+
   /**
    * Initializes a new clinical consultation thread with a welcome prompt.
    */
@@ -127,7 +149,7 @@ const Chatbot = ({ analysisResult }) => {
     const newId = Date.now().toString();
     const initialMsg = {
       role: 'bot',
-      content: "Hello! I'm your MedPulse Medical AI Assistant powered by Pinecone RAG & Groq. Ask me anything about diseases, symptoms, treatments, medications, or CT scan findings!",
+      content: "Hello! I'm your Medical Chatbot Assistant. Ask me anything about diseases, symptoms, treatments, medications, or scan findings!",
       timestamp: new Date().toISOString()
     };
     const newChat = {
@@ -199,7 +221,7 @@ const Chatbot = ({ analysisResult }) => {
     const titleSnippet = query.length > 28 ? query.substring(0, 28) + '...' : query;
 
     try {
-      const response = await sendChatMessage(query, newMessages);
+      const response = await sendChatMessage(query, messages);
       if (response.engine) setAiEngine(response.engine);
 
       const botReply = {
@@ -264,24 +286,70 @@ const Chatbot = ({ analysisResult }) => {
    */
   const renderFormattedContent = (content) => {
     const lines = content.split('\n');
-    return lines.map((line, idx) => {
+    const elements = [];
+    let tableRows = [];
+
+    const flushTable = () => {
+      if (tableRows.length > 0) {
+        // Filter out markdown separator lines like |---|---|
+        const dataRows = tableRows.filter(row => !row.match(/^[\s|:-]+$/));
+        
+        elements.push(
+          <div key={`table-${elements.length}`} style={{ overflowX: 'auto', margin: '12px 0', borderRadius: '8px', border: '1px solid var(--mp-border)', backgroundColor: 'var(--mp-bg)' }}>
+            <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '0.9em' }}>
+              <tbody>
+                {dataRows.map((row, rIdx) => {
+                  const cells = row.split('|').filter(c => c.trim() !== '').map(c => c.trim());
+                  return (
+                    <tr key={rIdx} style={{ borderBottom: '1px solid var(--mp-border)' }}>
+                      {cells.map((cell, cIdx) => {
+                        const isHeader = rIdx === 0;
+                        const Tag = isHeader ? 'th' : 'td';
+                        return (
+                          <Tag key={cIdx} style={{ padding: '10px 12px', textAlign: 'left', backgroundColor: isHeader ? 'rgba(0,0,0,0.02)' : 'transparent', fontWeight: isHeader ? '600' : 'normal' }} dangerouslySetInnerHTML={{ __html: formatBold(cell) }} />
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        );
+        tableRows = [];
+      }
+    };
+
+    lines.forEach((line, idx) => {
       const trimmed = line.trim();
+      
+      // Check for markdown table row
+      if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+        tableRows.push(trimmed);
+        return;
+      }
+      
+      flushTable(); // Flush any pending table if we hit a non-table line
+
       if (trimmed.startsWith('* ') || trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
         const bulletText = trimmed.replace(/^[*•-]\s*/, '');
-        return (
-          <li key={idx} dangerouslySetInnerHTML={{ __html: formatBold(bulletText) }} />
-        );
+        elements.push(<li key={`li-${idx}`} dangerouslySetInnerHTML={{ __html: formatBold(bulletText) }} style={{ marginLeft: '16px', marginBottom: '4px' }} />);
+        return;
       }
       if (trimmed.startsWith('### ')) {
-        return <h4 key={idx} style={{ margin: '10px 0 4px', fontSize: '1.05em' }}>{trimmed.replace('### ', '')}</h4>;
+        elements.push(<h4 key={`h4-${idx}`} style={{ margin: '12px 0 6px', fontSize: '1.05em' }}>{trimmed.replace('### ', '')}</h4>);
+        return;
       }
       if (!trimmed) {
-        return <div key={idx} style={{ height: '6px' }} />;
+        elements.push(<div key={`space-${idx}`} style={{ height: '6px' }} />);
+        return;
       }
-      return (
-        <p key={idx} dangerouslySetInnerHTML={{ __html: formatBold(trimmed) }} />
-      );
+      elements.push(<p key={`p-${idx}`} dangerouslySetInnerHTML={{ __html: formatBold(trimmed) }} style={{ marginBottom: '8px' }} />);
     });
+    
+    flushTable();
+
+    return elements;
   };
 
   /**
@@ -303,7 +371,7 @@ const Chatbot = ({ analysisResult }) => {
         className={`medpulse-launcher ${isOpen ? 'active' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Open Medical AI Assistant"
-        title="MedPulse AI Assistant"
+        title="Medical Chatbot Assistant"
       >
         {isOpen ? (
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -334,7 +402,7 @@ const Chatbot = ({ analysisResult }) => {
                     <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                   </svg>
                 </div>
-                <span className="mp-logo-text">MedPulse AI</span>
+                <span className="mp-logo-text">Medical Chatbot Assistant</span>
               </div>
             </div>
 
@@ -403,16 +471,16 @@ const Chatbot = ({ analysisResult }) => {
                   </svg>
                 </div>
                 <div className="header-brand-info">
-                  <h3 className="header-brand-title">MedPulse Assistant</h3>
-                  <p className="header-brand-sub">Grounded in Medical Literature</p>
+                  <h3 className="header-brand-title">Medical Chatbot Assistant</h3>
+                  <p className="header-brand-sub">Medical Chatbot</p>
                 </div>
               </div>
 
               <div className="header-controls">
-                <div className="mp-model-badge" title={aiEngine === 'python-medical-rag' ? 'Pinecone RAG + Groq LLaMA 3' : 'Medical Literature RAG'}>
+                <div className="mp-model-badge" title="Medical RAG">
                   <span className="mp-status-dot"></span>
-                  <span className="badge-text-full">{aiEngine === 'python-medical-rag' ? 'Pinecone RAG + Groq' : 'Medical Literature RAG'}</span>
-                  <span className="badge-text-short">{aiEngine === 'python-medical-rag' ? 'Pinecone RAG' : 'Medical RAG'}</span>
+                  <span className="badge-text-full">Medical RAG</span>
+                  <span className="badge-text-short">Medical RAG</span>
                 </div>
 
                 {/* New Chat Button (available in compressed mode too) */}
@@ -479,7 +547,7 @@ const Chatbot = ({ analysisResult }) => {
                     </svg>
                   </div>
                   <h2>What can I help you with?</h2>
-                  <p>Ask about diseases, symptoms, treatments, CT scan findings, or any health topic.</p>
+                  <p>Ask about diseases, symptoms, treatments, scan findings, or any health topic.</p>
 
                   <div className="mp-suggested-prompts">
                     {DEFAULT_PROMPTS.map((p, idx) => (
@@ -563,7 +631,7 @@ const Chatbot = ({ analysisResult }) => {
                 <textarea
                   ref={inputRef}
                   className="mp-textarea"
-                  placeholder="Ask a medical or CT scan question…"
+                  placeholder="Ask a medical or scan question…"
                   rows={1}
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
@@ -588,7 +656,7 @@ const Chatbot = ({ analysisResult }) => {
                 </button>
               </div>
               <p className="mp-disclaimer">
-                MedPulse AI provides clinical literature insights. Always consult a qualified physician for personalized diagnosis.
+                Medical Chatbot Assistant provides clinical literature insights. Always consult a qualified physician for personalized diagnosis.
               </p>
             </footer>
           </main>

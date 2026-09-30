@@ -138,20 +138,51 @@ const ResultDisplay = ({ result, imagePath }) => {
     <div className="result-section">
       <div className="result-header-bar">
         <h2>Analysis Results</h2>
-        <button className="btn-download-pdf" onClick={generatePDF}>
-          <span>📄</span> Download PDF Report
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button 
+            className="btn-rag-summary" 
+            onClick={() => {
+              const isInvalidOrNone = prediction.riskLevel.toLowerCase() === 'none' || prediction.result.toLowerCase().includes('no nodule');
+              
+              let prompt = `Based on the following scan analysis, please provide a detailed summary, clinical remedies, necessary precautions, and a general prescription format.\n\nDiagnosis: ${prediction.result}\nRisk Level: ${prediction.riskLevel.toUpperCase()}\nNodule Size: ${prediction.technicalDetails?.noduleSize || 'Unknown'}\nFindings: ${prediction.findings || 'None specified'}\nDescription: ${prediction.description}`;
+              
+              if (isInvalidOrNone) {
+                prompt = `[SYSTEM INSTRUCTION] Please provide a very brief summary of the following analysis report. Do NOT define medical terms, do NOT provide remedies, precautions, or a prescription format since no medical action is required. Just state what the image was identified as.\n\nDiagnosis: ${prediction.result}\nRisk Level: ${prediction.riskLevel.toUpperCase()}\nFindings: ${prediction.findings || 'None specified'}\nDescription: ${prediction.description}`;
+              }
+
+              window.dispatchEvent(new CustomEvent('open-chatbot-with-prompt', { detail: { prompt } }));
+            }}
+            style={{
+              padding: '10px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              backgroundColor: '#4f46e5',
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontWeight: '600',
+              boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2)'
+            }}
+          >
+            <span>🤖</span> RAG Summary & Remedies
+          </button>
+          <button className="btn-download-pdf" onClick={generatePDF}>
+            <span>📄</span> Download PDF Report
+          </button>
+        </div>
       </div>
 
       <div className="result-container nested-structure">
         {/* Left Column: Image and Findings */}
         <div className="result-column-left">
           <div className="result-card image-card">
-            <h3>Analyzed CT Scan</h3>
+            <h3>Analyzed Scan</h3>
             <div className="image-wrapper">
               <img
                 src={imagePath && imagePath.startsWith('http') ? imagePath : `${BACKEND_BASE_URL}${imagePath}`}
-                alt="Analyzed CT Scan"
+                alt="Analyzed Scan"
                 className="ct-scan-image"
               />
             </div>

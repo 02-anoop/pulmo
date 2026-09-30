@@ -21,8 +21,8 @@ const apiClient = axios.create({
 
 
 /**
- * Upload CT scan image for analysis
- * @param {File} imageFile - CT scan image file
+ * Upload scan image for analysis
+ * @param {File} imageFile - scan image file
  * @param {Function} onUploadProgress - Progress callback
  * @returns {Promise} API response with prediction
  */
@@ -84,13 +84,13 @@ export const getPredictionHistory = async () => {
  */
 export const sendChatMessage = async (message, history = []) => {
   try {
-    // Convert history to the format Gemini expects (alternating user/model roles)
+    // Convert history to the format expected by backend (alternating user/model roles)
     const geminiHistory = history
-      .filter(m => m.type === 'user' || m.type === 'bot')
+      .filter(m => (m.type === 'user' || m.type === 'bot' || m.role === 'user' || m.role === 'bot'))
       .slice(-10) // Keep last 10 messages for context window
       .map(m => ({
-        role: m.type === 'user' ? 'user' : 'model',
-        text: m.text,
+        role: (m.type === 'user' || m.role === 'user') ? 'user' : 'model',
+        text: m.text || m.content || '',
       }));
 
     const response = await apiClient.post('/chatbot', {

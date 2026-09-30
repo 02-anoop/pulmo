@@ -1,6 +1,6 @@
 /**
  * UPLOAD SECTION COMPONENT
- * CT scan image upload with drag-and-drop support and preview
+ * scan image upload with drag-and-drop support and preview
  * Clean, professional medical interface */
 
 import React, { useState, useRef, useCallback } from 'react';
@@ -28,7 +28,7 @@ const validateFile = (file) => {
 
 /**
  * UPLOAD SECTION COMPONENT
- * Provides drag-and-drop CT scan upload zone, local thumbnail preview,
+ * Provides drag-and-drop scan upload zone, local thumbnail preview,
  * progress tracking, and validation before sending to the backend AI analysis pipeline.
  *
  * @component
@@ -135,9 +135,9 @@ const UploadSection = ({ onUpload, isLoading }) => {
           <span className="pulse-dot"></span>
           AI-Powered Analysis
         </div>
-        <h2>CT Scan Analysis</h2>
+        <h2>Scan Analysis</h2>
         <p className="upload-subtitle">
-          Upload a pulmonary CT scan image for intelligent nodule detection and comprehensive diagnostic analysis.
+          Upload a pulmonary scan image for intelligent nodule detection and comprehensive diagnostic analysis.
         </p>
       </div>
 
@@ -170,7 +170,7 @@ const UploadSection = ({ onUpload, isLoading }) => {
                 </svg>
               </div>
               <h3 className="drop-zone-title">
-                {dragOver ? 'Drop your CT scan here' : 'Upload CT Scan Image'}
+                {dragOver ? 'Drop your scan here' : 'Upload Scan Image'}
               </h3>
               <p className="drop-zone-hint">
                 Drag & drop your image here, or <span className="browse-link">browse</span>
@@ -182,7 +182,7 @@ const UploadSection = ({ onUpload, isLoading }) => {
           ) : (
             <div className="drop-zone-preview">
               <div className="preview-image-container">
-                <img src={preview} alt="CT scan preview" className="preview-image" />
+                <img src={preview} alt="scan preview" className="preview-image" />
                 <div className="preview-overlay">
                   <div className="preview-badge">
                     <span>✓</span> Image Ready
@@ -215,7 +215,7 @@ const UploadSection = ({ onUpload, isLoading }) => {
             <div className="info-panel-icon">📋</div>
             <h4>How It Works</h4>
             <ol className="info-steps-list">
-              <li>Upload a CT scan image (PNG or JPG)</li>
+              <li>Upload a scan image (PNG or JPG)</li>
               <li>AI analyzes lung regions for nodules</li>
               <li>Get detailed diagnostic report</li>
               <li>Download report as PDF</li>
@@ -272,7 +272,7 @@ const UploadSection = ({ onUpload, isLoading }) => {
           ) : (
             <>
               <span>🔬</span>
-              <span>Analyze CT Scan</span>
+              <span>Analyze Scan</span>
             </>
           )}
         </button>

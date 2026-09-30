@@ -132,8 +132,9 @@ def load_llm():
         ChatOpenAI: Configured LLM runner for RAG generation.
     """
     api_key = os.getenv("GROQ_API_KEY")
+    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
     llm = ChatOpenAI(
-        model="groq/compound-mini",
+        model=model,
         api_key=api_key,
         base_url="https://api.groq.com/openai/v1",
         temperature=0.4,
@@ -204,7 +205,7 @@ BEHAVIOR RULES:
 3. **Creator / Developer / Profile questions** ("Who created/made this?", "Tell me about the developer", etc.): Answer directly, accurately, and politely using the context provided below.
 4. **General & Context-based questions**: Always use the retrieved context below to answer questions before deciding if something is out of scope.
 5. **Completely unrelated non-medical topics** (not in context and not about the project/creator): Politely steer back toward health topics in one short sentence.
-6. Keep responses concise, well-structured, and easy to understand. Do NOT show your reasoning or thinking steps.
+6. Keep responses concise, well-structured, and easy to read with bullet points when appropriate. Do NOT use markdown tables. Do NOT show your reasoning or thinking steps.
 7. For medical diagnostic or clinical advice only: add a brief disclaimer that responses are informational and not a substitute for professional advice.
 8. **Follow-up questions**: If the user refers to something mentioned earlier, use the conversation history below to understand what they mean.
 

@@ -14,23 +14,18 @@ function LandingPage({ onNavigate }) {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
-          <div className="hero-badge">
-            <span className="pulse-dot"></span>
-            AI-Powered Medical Imaging
-          </div>
-          
           <h1 className="hero-title">
-            Advanced <span className="gradient-text">Pulmonary Nodule</span> Detection
+            Medical <span className="gradient-text">Chatbot Assistant</span>
           </h1>
           
           <p className="hero-description">
-            Harness the power of artificial intelligence to analyze CT scans with precision and speed. 
-            Our advanced system helps detect pulmonary nodules early, enabling timely intervention and better patient outcomes.
+            A fast, straightforward tool for analyzing scans and detecting pulmonary nodules. 
+            It combines visual detection with a medical RAG assistant to give you clear, actionable insights in seconds.
           </p>
           
           <div className="hero-buttons">
             <button className="btn-primary-large" onClick={() => onNavigate('scan')}>
-              <span>Start CT Scan Analysis</span>
+              <span>Start Scan Analysis</span>
               <span>→</span>
             </button>
             <button className="btn-secondary-large" onClick={() => onNavigate('scan')}>
@@ -41,18 +36,18 @@ function LandingPage({ onNavigate }) {
           
           <div className="hero-stats">
             <div className="stat-item">
-              <div className="stat-number">99.2%</div>
-              <div className="stat-label">Accuracy Rate</div>
+              <div className="stat-number">AI-Driven</div>
+              <div className="stat-label">Vision Analysis</div>
             </div>
             <div className="stat-divider"></div>
             <div className="stat-item">
-              <div className="stat-number">&lt;30s</div>
-              <div className="stat-label">Analysis Time</div>
+              <div className="stat-number">Real-Time</div>
+              <div className="stat-label">RAG Chatbot</div>
             </div>
             <div className="stat-divider"></div>
             <div className="stat-item">
-              <div className="stat-number">50K+</div>
-              <div className="stat-label">Scans Analyzed</div>
+              <div className="stat-number">Evidence-Based</div>
+              <div className="stat-label">Clinical Guidelines</div>
             </div>
           </div>
         </div>
@@ -60,10 +55,6 @@ function LandingPage({ onNavigate }) {
         <div className="hero-visual">
           <div className="visual-container">
             {/* Floating Cards */}
-            <div className="floating-card card-1">
-              <div className="card-icon">🫁</div>
-              <div className="card-title">Lung Analysis</div>
-            </div>
             
             <div className="floating-card card-2">
               <div className="card-icon">🔬</div>
@@ -96,9 +87,9 @@ function LandingPage({ onNavigate }) {
             <div className="feature-icon-wrapper">
               <div className="feature-icon">🤖</div>
             </div>
-            <h3>AI-Powered Analysis</h3>
+            <h3>Vision AI Analysis</h3>
             <p>
-              Advanced deep learning algorithms trained on millions of CT scans to provide accurate nodule detection and classification.
+              Uses Google Gemini Vision to scan uploaded medical images and identify potential pulmonary nodules.
             </p>
           </div>
           
@@ -106,39 +97,9 @@ function LandingPage({ onNavigate }) {
             <div className="feature-icon-wrapper">
               <div className="feature-icon">⚡</div>
             </div>
-            <h3>Lightning Fast Results</h3>
+            <h3>Fast Processing</h3>
             <p>
-              Get comprehensive analysis results in under 30 seconds, dramatically reducing diagnosis time and improving workflow efficiency.
-            </p>
-          </div>
-          
-          <div className="feature-card">
-            <div className="feature-icon-wrapper">
-              <div className="feature-icon">🎯</div>
-            </div>
-            <h3>Precision Detection</h3>
-            <p>
-              Identify even the smallest nodules with exceptional accuracy, ensuring no potential concerns go unnoticed.
-            </p>
-          </div>
-          
-          <div className="feature-card">
-            <div className="feature-icon-wrapper">
-              <div className="feature-icon">📈</div>
-            </div>
-            <h3>Comprehensive Reports</h3>
-            <p>
-              Detailed diagnostic reports with size measurements, risk assessment, and clinical recommendations for informed decision-making.
-            </p>
-          </div>
-          
-          <div className="feature-card">
-            <div className="feature-icon-wrapper">
-              <div className="feature-icon">🔒</div>
-            </div>
-            <h3>Secure & Compliant</h3>
-            <p>
-              Enterprise-grade security with full HIPAA compliance ensures patient data privacy and regulatory adherence.
+              Returns structured diagnostic data, measurements, and risk assessments in just a few seconds.
             </p>
           </div>
           
@@ -146,9 +107,9 @@ function LandingPage({ onNavigate }) {
             <div className="feature-icon-wrapper">
               <div className="feature-icon">💬</div>
             </div>
-            <h3>24/7 AI Assistant</h3>
+            <h3>RAG Chatbot</h3>
             <p>
-              Get instant answers to medical questions with our intelligent chatbot, available round the clock for your convenience.
+              Connects to a Pinecone vector database of medical data to answer your questions accurately.
             </p>
           </div>
         </div>
@@ -159,7 +120,7 @@ function LandingPage({ onNavigate }) {
         <div className="section-header">
           <h2 className="section-title">How It <span className="gradient-text">Works</span></h2>
           <p className="section-subtitle">
-            Simple, fast, and accurate - get your CT scan analysis in three easy steps
+            Simple, fast, and accurate - get your scan analysis in three easy steps
           </p>
         </div>
         
@@ -167,9 +128,9 @@ function LandingPage({ onNavigate }) {
           <div className="step">
             <div className="step-number">1</div>
             <div className="step-content">
-              <h3>Upload CT Scan</h3>
+              <h3>Upload Scan</h3>
               <p>
-                Simply upload your CT scan image in JPEG or PNG format. Our system accepts standard medical imaging formats.
+                Simply upload your scan image in JPEG or PNG format. Our system accepts standard scan formats.
               </p>
             </div>
           </div>
@@ -203,9 +164,9 @@ function LandingPage({ onNavigate }) {
       {/* CTA Section */}
       <section className="cta-section">
         <div className="cta-content">
-          <h2>Ready to Experience the Future of Medical Imaging?</h2>
+          <h2>Ready to Experience the Future of AI Diagnostics?</h2>
           <p>
-            Start analyzing CT scans with our advanced AI platform today and join thousands of healthcare professionals 
+            Start analyzing scans with our advanced AI platform today and join thousands of healthcare professionals 
             who trust PulmoAI for accurate pulmonary nodule detection.
           </p>
           <button className="btn-cta" onClick={() => onNavigate('scan')}>

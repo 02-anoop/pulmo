@@ -20,7 +20,7 @@ const RAG_SERVICE_URL = process.env.RAG_SERVICE_URL || 'http://localhost:5000/as
 
 const knowledgeBase = [
   {
-    keywords: ['what is', 'lung nodule', 'pulmonary nodule'],
+    keywords: ['lung nodule', 'pulmonary nodule'],
     response:
       'A lung nodule (or pulmonary nodule) is a small, round or oval-shaped growth in the lung. ' +
       'Most lung nodules are benign (non-cancerous), but some can be malignant. They are typically ' +
@@ -153,7 +153,7 @@ router.post('/chatbot', async (req, res) => {
       const ragResponse = await axios.post(
         RAG_SERVICE_URL,
         { query: message, history: formattedHistory },
-        { timeout: 3500 }
+        { timeout: 10000 }
       );
 
       if (ragResponse.data && ragResponse.data.answer) {

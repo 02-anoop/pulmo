@@ -85,7 +85,6 @@ const Navbar = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
           </div>
           <span className="logo-text">
             <span className="logo-main">PulmoAI</span>
-            <span className="logo-sub">Medical Imaging</span>
           </span>
         </div>
 
@@ -113,7 +112,7 @@ const Navbar = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
             className={`nav-link ${currentPage === 'scan' ? 'active' : ''}`}
             onClick={() => handleNavClick('scan')}
           >
-            CT Scan Analysis
+            Scan Analysis
           </button>
         </div>
 

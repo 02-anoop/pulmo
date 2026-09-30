@@ -107,7 +107,7 @@ function ErrorCard({ message }) {
 
 /**
  * PulmoAI Root Application Component.
- * Manages global application state including navigation, CT scan upload results,
+ * Manages global application state including navigation, scan upload results,
  * loading indicators, theme toggles, and backend health status.
  *
  * @name App
@@ -167,10 +167,10 @@ function App() {
   };
 
   /**
-   * Orchestrates CT scan image upload, tracking upload progress,
+   * Orchestrates scan image upload, tracking upload progress,
    * triggering Vision AI analysis, and transitioning to results view.
    *
-   * @param {File} file - Selected CT scan or DICOM image file
+   * @param {File} file - Selected scan or DICOM image file
    * @param {Function} onProgress - Percentage completion callback (0-100)
    */
   const handleUpload = async (file, onProgress) => {
